@@ -38,7 +38,7 @@ fn main() {
 
     // setting up basics
     // let mut mesh: Mesh = create_initial_triangles();
-    let mut mesh: Mesh = get_mesh("src/meshes/meshes/spider.obj");
+    let mut mesh: Mesh = get_mesh("src/meshes/meshes/video_ship.obj");
     let projection_matrix: Matrix4<f32> = create_projection_matrix();
     let mut theta = 1.;
     let camera: Vec3 = Vec3 {
@@ -46,6 +46,7 @@ fn main() {
         y: 0.,
         z: 0.,
     };
+    let mut once = true;
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
         let mut dt = DrawTarget::new(WIDTH as i32, HEIGHT as i32);
@@ -90,6 +91,14 @@ fn main() {
                 // add light
                 add_lightsource(normal, &mut final_triangle);
 
+                // debug
+                if once {
+                    once = false;
+                    println!("final triangle {:#?}", &final_triangle);
+                    println!("after_z triangle {:#?}", &after_z);
+                    println!("after_xz triangle {:#?}", &after_xz);
+                    println!("normal {:#?}", &normal);
+                }
                 // add to final triangle queue
                 triangle_queue.push(final_triangle);
             }
