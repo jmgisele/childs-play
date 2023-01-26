@@ -34,6 +34,15 @@ pub struct Vec3 {
     pub z: f32,
 }
 
+impl Default for Vec3 {
+    fn default() -> Self {
+        Vec3 {
+            x: 0.,
+            y: 0.,
+            z: 0.,
+        }
+    }
+}
 impl Vec3 {
     pub fn divide_by(&mut self, val: f32) {
         self.x /= val;

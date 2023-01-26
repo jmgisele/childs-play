@@ -1,15 +1,14 @@
 use crate::camera::lightsource::add_lightsource;
 use crate::drawing::render::render;
-use crate::linear_algebra::data::{initialize_empty_triangle, Mesh};
+use crate::linear_algebra::data::Mesh;
 use crate::linear_algebra::matrices::{
-    create_projection_matrix, create_x_rot_mat, create_z_rot_mat, world_matrix,
+    create_projection_matrix, create_x_rot_mat, create_z_rot_mat,
 };
-use crate::linear_algebra::triangles::{
-    derive_normal, offset_triangle, project_3_2_d_tri, rotate_triangle, Triangle,
-};
+use crate::linear_algebra::triangles::{derive_normal, offset_triangle_output, Triangle};
 use crate::linear_algebra::vectors::{scale_x_y, Vec3};
 use crate::meshes::initialize_mesh::get_mesh;
 
+use linear_algebra::matrices::multiply_matrix_vector_output;
 use minifb::{Key, Window, WindowOptions};
 use nalgebra::base::Matrix4;
 use raqote::{DrawTarget, SolidSource};
@@ -46,7 +45,6 @@ fn main() {
         y: 0.,
         z: 0.,
     };
-    let mut once = true;
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
         let mut dt = DrawTarget::new(WIDTH as i32, HEIGHT as i32);
@@ -65,42 +63,47 @@ fn main() {
         let mut triangle_queue: Vec<Triangle> = Vec::new();
 
         for triangle in mesh.triangles.iter_mut() {
-            // OLD STRAT
-            let mut after_z: Triangle = initialize_empty_triangle();
-            let mut after_xz: Triangle = initialize_empty_triangle();
-            let mut final_triangle: Triangle = initialize_empty_triangle();
-            // rotate in z
-            rotate_triangle(&triangle, &mut after_z, &z_rot_matrix);
-            // rotate in x
-            rotate_triangle(&after_z, &mut after_xz, &x_rot_matrix);
-            //  Offset
-            offset_triangle(&mut after_xz, 6.);
+            let mut trans_triangle: Triangle = Triangle { ..*triangle };
+
+            // z rot
+            for i in 0..3 {
+                trans_triangle.vertices[i] =
+                    multiply_matrix_vector_output(&trans_triangle.vertices[i], &z_rot_matrix)
+            }
+
+            // x rot
+            for i in 0..3 {
+                trans_triangle.vertices[i] =
+                    multiply_matrix_vector_output(&trans_triangle.vertices[i], &x_rot_matrix)
+            }
+
+            // offset
+            trans_triangle = offset_triangle_output(&trans_triangle, 6.);
+
             //normals
-            let normal = derive_normal(&after_xz);
-            let surface_dot: f32 = normal.x * (after_xz.vertices[0].x - camera.x)
-                + normal.y * (after_xz.vertices[0].y - camera.y)
-                + normal.z * (after_xz.vertices[0].z - camera.z);
+            let normal = derive_normal(&trans_triangle);
+
+            let surface_dot: f32 = normal.x * (trans_triangle.vertices[0].x - camera.x)
+                + normal.y * (trans_triangle.vertices[0].y - camera.y)
+                + normal.z * (trans_triangle.vertices[0].z - camera.z);
 
             if surface_dot < 0. {
                 // project to 2D
-                project_3_2_d_tri(&after_xz, &mut final_triangle, &projection_matrix);
+                for i in 0..3 {
+                    trans_triangle.vertices[i] = multiply_matrix_vector_output(
+                        &trans_triangle.vertices[i],
+                        &projection_matrix,
+                    )
+                }
 
                 // Scale into view
-                scale_x_y(&mut final_triangle);
+                scale_x_y(&mut trans_triangle);
 
                 // add light
-                add_lightsource(normal, &mut final_triangle);
+                add_lightsource(normal, &mut trans_triangle);
 
-                // debug
-                if once {
-                    once = false;
-                    println!("final triangle {:#?}", &final_triangle);
-                    println!("after_z triangle {:#?}", &after_z);
-                    println!("after_xz triangle {:#?}", &after_xz);
-                    println!("normal {:#?}", &normal);
-                }
                 // add to final triangle queue
-                triangle_queue.push(final_triangle);
+                triangle_queue.push(trans_triangle);
             }
         }
 

@@ -1,6 +1,6 @@
 use crate::linear_algebra::vectors::Vec3;
 use crate::{HEIGHT, WIDTH};
-use nalgebra::base::{Matrix4, Vector3};
+use nalgebra::base::Matrix4;
 
 pub fn create_projection_matrix() -> Matrix4<f32> {
     let mut proj_matrix: Matrix4<f32> = Matrix4::from_element(0.0);
@@ -51,6 +51,34 @@ pub fn create_z_rot_mat(theta: &f32) -> Matrix4<f32> {
     mat
 }
 
+pub fn multiply_matrix_vector_output(input_vec: &Vec3, proj_mat: &Matrix4<f32>) -> Vec3 {
+    let mut projected_vector: Vec3 = Vec3 {
+        x: input_vec.x * proj_mat[(0, 0)]
+            + input_vec.y * proj_mat[(1, 0)]
+            + input_vec.z * proj_mat[(2, 0)]
+            + proj_mat[(3, 0)],
+        y: input_vec.x * proj_mat[(0, 1)]
+            + input_vec.y * proj_mat[(1, 1)]
+            + input_vec.z * proj_mat[(2, 1)]
+            + proj_mat[(3, 1)],
+        z: input_vec.x * proj_mat[(0, 2)]
+            + input_vec.y * proj_mat[(1, 2)]
+            + input_vec.z * proj_mat[(2, 2)]
+            + proj_mat[(3, 2)],
+    };
+
+    let w: f32 = input_vec.x * proj_mat[(0, 3)]
+        + input_vec.y * proj_mat[(1, 3)]
+        + input_vec.z * proj_mat[(2, 3)]
+        + proj_mat[(3, 3)];
+
+    if w != 0.0 {
+        projected_vector.divide_by(w)
+    }
+
+    projected_vector
+}
+
 pub fn multiply_matrices(input_matrix: &Vec3, output_vec: &mut Vec3, proj_mat: &Matrix4<f32>) {
     *output_vec = Vec3 {
         x: input_matrix.x * proj_mat[(0, 0)]
@@ -77,14 +105,20 @@ pub fn multiply_matrices(input_matrix: &Vec3, output_vec: &mut Vec3, proj_mat: &
     }
 }
 
+pub fn create_trans_matrix(x: f32, y: f32, z: f32) -> Matrix4<f32> {
+    let mut matrix: Matrix4<f32> = Matrix4::zeros();
+    matrix[(0, 0)] = 1.;
+    matrix[(1, 1)] = 1.;
+    matrix[(2, 2)] = 1.;
+    matrix[(3, 3)] = 1.;
+    matrix[(3, 0)] = x;
+    matrix[(3, 1)] = y;
+    matrix[(3, 2)] = z;
+    matrix
+}
+
 pub fn world_matrix(theta: &f32, trans_vec: Vec3) -> Matrix4<f32> {
     let world_matrix: Matrix4<f32> = create_z_rot_mat(theta) * create_x_rot_mat(theta);
 
-    #[rustfmt::skip]
-    let trans_matrix: Matrix4<f32> = Matrix4::new(1., 0., 0., 0.,
-                                                    0., 1., 0., 0.,
-                                                    0., 0., 1., 0.,
-                                                    trans_vec.x, trans_vec.y, trans_vec.z, 1.);
-
-    world_matrix * trans_matrix
+    world_matrix * create_trans_matrix(trans_vec.x, trans_vec.y, trans_vec.z)
 }

@@ -16,7 +16,7 @@ impl Triangle {
 }
 
 impl Default for Triangle {
-    fn default() -> Triangle {
+    fn default() -> Self {
         Triangle {
             vertices: [
                 Vec3 {
@@ -65,8 +65,41 @@ pub fn offset_triangle(tri: &mut Triangle, val: f32) {
     }
 }
 
+pub fn offset_triangle_output(tri: &Triangle, val: f32) -> Triangle {
+    let mut offset_tri: Triangle = Triangle { ..*tri };
+
+    for i in 0..3 {
+        offset_tri.vertices[i].add_z(val)
+    }
+
+    offset_tri
+}
+
 pub fn project_3_2_d_tri(in_mat: &Triangle, out_mat: &mut Triangle, proj_mat: &Matrix4<f32>) {
     for i in 0..3 {
         multiply_matrices(&in_mat.vertices[i], &mut out_mat.vertices[i], &proj_mat);
     }
+}
+
+pub fn initialize_empty_triangle() -> Triangle {
+    return Triangle {
+        vertices: [
+            Vec3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            Vec3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            Vec3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+        ],
+        ..Default::default()
+    };
 }
