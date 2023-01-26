@@ -39,13 +39,3 @@ pub fn derive_normal(triangle: &Triangle) -> Vector4<f32> {
 
     normalize_vec(&cross_product(&line_1, &line_2))
 }
-
-pub fn offset_triangle(tri: &Triangle, val: f32) -> Triangle {
-    let mut offset_tri: Triangle = Triangle { ..*tri };
-
-    for i in 0..3 {
-        offset_tri.vertices[i].z += val;
-    }
-
-    offset_tri
-}

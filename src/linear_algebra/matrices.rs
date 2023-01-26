@@ -80,3 +80,43 @@ pub fn multiply_matrix_vector(input_vec: &Vector4<f32>, proj_mat: &Matrix4<f32>)
 
     projected_vector
 }
+
+pub fn create_trans_matrix(x: f32, y: f32, z: f32) -> Matrix4<f32> {
+    let mut matrix: Matrix4<f32> = Matrix4::zeros();
+    matrix[(0, 0)] = 1.;
+    matrix[(1, 1)] = 1.;
+    matrix[(2, 2)] = 1.;
+    matrix[(3, 3)] = 1.;
+    matrix[(3, 0)] = x;
+    matrix[(3, 1)] = y;
+    matrix[(3, 2)] = z;
+    matrix
+}
+
+pub fn world_matrix(
+    trans_vec: &Vector4<f32>,
+    z_rot_m: &Matrix4<f32>,
+    x_rot_m: &Matrix4<f32>,
+) -> Matrix4<f32> {
+    let world_matrix: Matrix4<f32> = multiply_matrices(&z_rot_m, &x_rot_m);
+
+    multiply_matrices(
+        &world_matrix,
+        &create_trans_matrix(trans_vec.x, trans_vec.y, trans_vec.z),
+    )
+}
+
+pub fn multiply_matrices(m1: &Matrix4<f32>, m2: &Matrix4<f32>) -> Matrix4<f32> {
+    let mut multiplied: Matrix4<f32> = Matrix4::zeros();
+
+    for c in 0..4 {
+        for r in 0..4 {
+            multiplied[(r, c)] = m1[(r, 0)] * m2[(0, c)]
+                + m1[(r, 1)] * m2[(1, c)]
+                + m1[(r, 2)] * m2[(2, c)]
+                + m1[(r, 3)] * m2[(3, c)];
+        }
+    }
+
+    multiplied
+}
