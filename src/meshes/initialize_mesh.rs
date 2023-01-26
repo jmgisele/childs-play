@@ -1,267 +1,16 @@
-use crate::{Mesh, Triangle, Vec3};
+use nalgebra::Vector4;
+
+use crate::{Mesh, Triangle};
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
-
-pub fn _create_initial_triangles() -> Mesh {
-    return Mesh {
-        triangles: vec![
-            // south
-            Triangle {
-                vertices: [
-                    Vec3 {
-                        x: 0.0,
-                        y: 0.0,
-                        z: 0.0,
-                    },
-                    Vec3 {
-                        x: 0.0,
-                        y: 1.0,
-                        z: 0.0,
-                    },
-                    Vec3 {
-                        x: 1.0,
-                        y: 1.0,
-                        z: 0.0,
-                    },
-                ],
-                ..Default::default()
-            },
-            Triangle {
-                vertices: [
-                    Vec3 {
-                        x: 0.0,
-                        y: 0.0,
-                        z: 0.0,
-                    },
-                    Vec3 {
-                        x: 1.0,
-                        y: 1.0,
-                        z: 0.0,
-                    },
-                    Vec3 {
-                        x: 1.0,
-                        y: 0.0,
-                        z: 0.0,
-                    },
-                ],
-                ..Default::default()
-            },
-            // east
-            Triangle {
-                vertices: [
-                    Vec3 {
-                        x: 1.0,
-                        y: 0.0,
-                        z: 0.0,
-                    },
-                    Vec3 {
-                        x: 1.0,
-                        y: 1.0,
-                        z: 0.0,
-                    },
-                    Vec3 {
-                        x: 1.0,
-                        y: 1.0,
-                        z: 1.0,
-                    },
-                ],
-                ..Default::default()
-            },
-            Triangle {
-                vertices: [
-                    Vec3 {
-                        x: 1.0,
-                        y: 0.0,
-                        z: 0.0,
-                    },
-                    Vec3 {
-                        x: 1.0,
-                        y: 1.0,
-                        z: 1.0,
-                    },
-                    Vec3 {
-                        x: 1.0,
-                        y: 0.0,
-                        z: 1.0,
-                    },
-                ],
-                ..Default::default()
-            },
-            // north
-            Triangle {
-                vertices: [
-                    Vec3 {
-                        x: 1.0,
-                        y: 0.0,
-                        z: 1.0,
-                    },
-                    Vec3 {
-                        x: 1.0,
-                        y: 1.0,
-                        z: 1.0,
-                    },
-                    Vec3 {
-                        x: 0.0,
-                        y: 1.0,
-                        z: 1.0,
-                    },
-                ],
-                ..Default::default()
-            },
-            Triangle {
-                vertices: [
-                    Vec3 {
-                        x: 1.0,
-                        y: 0.0,
-                        z: 1.0,
-                    },
-                    Vec3 {
-                        x: 0.0,
-                        y: 1.0,
-                        z: 1.0,
-                    },
-                    Vec3 {
-                        x: 0.0,
-                        y: 0.0,
-                        z: 1.0,
-                    },
-                ],
-                ..Default::default()
-            },
-            // west
-            Triangle {
-                vertices: [
-                    Vec3 {
-                        x: 0.0,
-                        y: 0.0,
-                        z: 1.0,
-                    },
-                    Vec3 {
-                        x: 0.0,
-                        y: 1.0,
-                        z: 1.0,
-                    },
-                    Vec3 {
-                        x: 0.0,
-                        y: 1.0,
-                        z: 0.0,
-                    },
-                ],
-                ..Default::default()
-            },
-            Triangle {
-                vertices: [
-                    Vec3 {
-                        x: 0.0,
-                        y: 0.0,
-                        z: 1.0,
-                    },
-                    Vec3 {
-                        x: 0.0,
-                        y: 1.0,
-                        z: 0.0,
-                    },
-                    Vec3 {
-                        x: 0.0,
-                        y: 0.0,
-                        z: 0.0,
-                    },
-                ],
-                ..Default::default()
-            },
-            // top
-            Triangle {
-                vertices: [
-                    Vec3 {
-                        x: 0.0,
-                        y: 1.0,
-                        z: 0.0,
-                    },
-                    Vec3 {
-                        x: 0.0,
-                        y: 1.0,
-                        z: 1.0,
-                    },
-                    Vec3 {
-                        x: 1.0,
-                        y: 1.0,
-                        z: 1.0,
-                    },
-                ],
-                ..Default::default()
-            },
-            Triangle {
-                vertices: [
-                    Vec3 {
-                        x: 0.0,
-                        y: 1.0,
-                        z: 0.0,
-                    },
-                    Vec3 {
-                        x: 1.0,
-                        y: 1.0,
-                        z: 1.0,
-                    },
-                    Vec3 {
-                        x: 1.0,
-                        y: 1.0,
-                        z: 0.0,
-                    },
-                ],
-                ..Default::default()
-            },
-            // bottom
-            Triangle {
-                vertices: [
-                    Vec3 {
-                        x: 1.0,
-                        y: 0.0,
-                        z: 1.0,
-                    },
-                    Vec3 {
-                        x: 0.0,
-                        y: 0.0,
-                        z: 1.0,
-                    },
-                    Vec3 {
-                        x: 0.0,
-                        y: 0.0,
-                        z: 0.0,
-                    },
-                ],
-                ..Default::default()
-            },
-            Triangle {
-                vertices: [
-                    Vec3 {
-                        x: 1.0,
-                        y: 0.0,
-                        z: 1.0,
-                    },
-                    Vec3 {
-                        x: 0.0,
-                        y: 0.0,
-                        z: 0.0,
-                    },
-                    Vec3 {
-                        x: 1.0,
-                        y: 0.0,
-                        z: 0.0,
-                    },
-                ],
-                ..Default::default()
-            },
-        ],
-    };
-}
 
 pub fn get_mesh(file_path: &str) -> Mesh {
     let mut mesh: Mesh = Mesh {
         triangles: Vec::new(),
     };
 
-    let mut vertices_list: Vec<Vec3> = Vec::new();
+    let mut vertices_list: Vec<Vector4<f32>> = Vec::new();
 
     if let Ok(lines) = read_lines(file_path) {
         // Consumes the iterator, returns an (Optional) String
@@ -276,11 +25,12 @@ pub fn get_mesh(file_path: &str) -> Mesh {
                         split_float.push(split_str[i].parse::<f32>().unwrap());
                     }
 
-                    vertices_list.push(Vec3 {
-                        x: split_float[0],
-                        y: split_float[1],
-                        z: split_float[2],
-                    });
+                    vertices_list.push(Vector4::new(
+                        split_float[0],
+                        split_float[1],
+                        split_float[2],
+                        1.,
+                    ));
                 } else if &ip[..1] == "f" {
                     let full_line: String = String::from(&ip[2..]);
                     let split_str: Vec<&str> = full_line.split(' ').collect();

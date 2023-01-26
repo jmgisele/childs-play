@@ -1,11 +1,10 @@
-use super::matrices::multiply_matrices;
-use super::vectors::{cross_product, get_line, Vec3};
-use nalgebra::base::Matrix4;
+use super::vectors::{cross_product, get_line, normalize_vec};
+use nalgebra::base::Vector4;
 use raqote::SolidSource;
 
 #[derive(Debug)]
 pub struct Triangle {
-    pub vertices: [Vec3; 3],
+    pub vertices: [Vector4<f32>; 3],
     pub color: SolidSource,
 }
 
@@ -19,21 +18,9 @@ impl Default for Triangle {
     fn default() -> Self {
         Triangle {
             vertices: [
-                Vec3 {
-                    x: 0.,
-                    y: 0.,
-                    z: 0.,
-                },
-                Vec3 {
-                    x: 0.,
-                    y: 0.,
-                    z: 0.,
-                },
-                Vec3 {
-                    x: 0.,
-                    y: 0.,
-                    z: 0.,
-                },
+                Vector4::new(0., 0., 0., 1.),
+                Vector4::new(0., 0., 0., 1.),
+                Vector4::new(0., 0., 0., 1.),
             ],
             color: SolidSource {
                 r: 0xd6,
@@ -45,61 +32,20 @@ impl Default for Triangle {
     }
 }
 
-pub fn derive_normal(triangle: &Triangle) -> Vec3 {
-    let line_1: Vec3 = get_line(&triangle.vertices[0], &triangle.vertices[1]);
+pub fn derive_normal(triangle: &Triangle) -> Vector4<f32> {
+    let line_1: Vector4<f32> = get_line(&triangle.vertices[0], &triangle.vertices[1]);
 
-    let line_2: Vec3 = get_line(&triangle.vertices[0], &triangle.vertices[2]);
+    let line_2: Vector4<f32> = get_line(&triangle.vertices[0], &triangle.vertices[2]);
 
-    (&cross_product(&line_1, &line_2)).normalize_vec()
+    normalize_vec(&cross_product(&line_1, &line_2))
 }
 
-pub fn rotate_triangle(in_m: &Triangle, out_m: &mut Triangle, rot_m: &Matrix4<f32>) {
-    for i in 0..3 {
-        multiply_matrices(&in_m.vertices[i], &mut out_m.vertices[i], &rot_m);
-    }
-}
-
-pub fn offset_triangle(tri: &mut Triangle, val: f32) {
-    for i in 0..3 {
-        tri.vertices[i].add_z(val)
-    }
-}
-
-pub fn offset_triangle_output(tri: &Triangle, val: f32) -> Triangle {
+pub fn offset_triangle(tri: &Triangle, val: f32) -> Triangle {
     let mut offset_tri: Triangle = Triangle { ..*tri };
 
     for i in 0..3 {
-        offset_tri.vertices[i].add_z(val)
+        offset_tri.vertices[i].z += val;
     }
 
     offset_tri
-}
-
-pub fn project_3_2_d_tri(in_mat: &Triangle, out_mat: &mut Triangle, proj_mat: &Matrix4<f32>) {
-    for i in 0..3 {
-        multiply_matrices(&in_mat.vertices[i], &mut out_mat.vertices[i], &proj_mat);
-    }
-}
-
-pub fn initialize_empty_triangle() -> Triangle {
-    return Triangle {
-        vertices: [
-            Vec3 {
-                x: 0.0,
-                y: 0.0,
-                z: 0.0,
-            },
-            Vec3 {
-                x: 0.0,
-                y: 0.0,
-                z: 0.0,
-            },
-            Vec3 {
-                x: 0.0,
-                y: 0.0,
-                z: 0.0,
-            },
-        ],
-        ..Default::default()
-    };
 }
