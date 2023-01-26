@@ -1,5 +1,8 @@
+use crate::linear_algebra::vectors::{mult_vec, normalize_vec, sub_vec};
 use crate::{HEIGHT, WIDTH};
 use nalgebra::base::{Matrix4, Vector4};
+
+use super::vectors::{cross_product, dot_product};
 
 pub fn create_projection_matrix() -> Matrix4<f32> {
     let mut proj_matrix: Matrix4<f32> = Matrix4::from_element(0.0);
@@ -50,6 +53,27 @@ pub fn create_z_rot_mat(theta: &f32) -> Matrix4<f32> {
     mat
 }
 
+pub fn multiply_matrix_vec(input_vec: &Vector4<f32>, proj_mat: &Matrix4<f32>) -> Vector4<f32> {
+    Vector4::new(
+        input_vec.x * proj_mat[(0, 0)]
+            + input_vec.y * proj_mat[(1, 0)]
+            + input_vec.z * proj_mat[(2, 0)]
+            + proj_mat[(3, 0)],
+        input_vec.x * proj_mat[(0, 1)]
+            + input_vec.y * proj_mat[(1, 1)]
+            + input_vec.z * proj_mat[(2, 1)]
+            + proj_mat[(3, 1)],
+        input_vec.x * proj_mat[(0, 2)]
+            + input_vec.y * proj_mat[(1, 2)]
+            + input_vec.z * proj_mat[(2, 2)]
+            + proj_mat[(3, 2)],
+        input_vec.x * proj_mat[(0, 3)]
+            + input_vec.y * proj_mat[(1, 3)]
+            + input_vec.z * proj_mat[(2, 3)]
+            + input_vec.w * proj_mat[(3, 3)],
+    )
+}
+
 pub fn multiply_matrix_vector(input_vec: &Vector4<f32>, proj_mat: &Matrix4<f32>) -> Vector4<f32> {
     let mut projected_vector: Vector4<f32> = Vector4::new(
         input_vec.x * proj_mat[(0, 0)]
@@ -81,6 +105,42 @@ pub fn multiply_matrix_vector(input_vec: &Vector4<f32>, proj_mat: &Matrix4<f32>)
     projected_vector
 }
 
+pub fn multiply_matrices(m1: &Matrix4<f32>, m2: &Matrix4<f32>) -> Matrix4<f32> {
+    let mut multiplied: Matrix4<f32> = Matrix4::zeros();
+
+    for c in 0..4 {
+        for r in 0..4 {
+            multiplied[(r, c)] = m1[(r, 0)] * m2[(0, c)]
+                + m1[(r, 1)] * m2[(1, c)]
+                + m1[(r, 2)] * m2[(2, c)]
+                + m1[(r, 3)] * m2[(3, c)];
+        }
+    }
+
+    multiplied
+}
+
+pub fn create_point_at_matrix(
+    position: Vector4<f32>,
+    target: Vector4<f32>,
+    up: Vector4<f32>,
+) -> Matrix4<f32> {
+    let new_forward_dir: Vector4<f32> = normalize_vec(&sub_vec(&target, &position));
+    let a: Vector4<f32> = mult_vec(&new_forward_dir, dot_product(&up, &new_forward_dir));
+    let new_up_dir: Vector4<f32> = sub_vec(&up, &a);
+
+    let new_right_dir: Vector4<f32> = cross_product(&new_up_dir, &new_forward_dir);
+
+    // return point at matrix
+    #[rustfmt::skip]
+    let point_at: Matrix4<f32> = Matrix4::new(new_right_dir.x, new_right_dir.y, new_right_dir.z, 0.,
+                                                    new_up_dir.x, new_up_dir.y, new_up_dir.z, 0.,
+                                                    new_forward_dir.x, new_forward_dir.y, new_forward_dir.z, 0.,
+                                                    position.x, position.y, position.z, 1.,
+                                                );
+    point_at
+}
+
 pub fn create_trans_matrix(x: f32, y: f32, z: f32) -> Matrix4<f32> {
     let mut matrix: Matrix4<f32> = Matrix4::zeros();
     matrix[(0, 0)] = 1.;
@@ -104,19 +164,4 @@ pub fn world_matrix(
         &world_matrix,
         &create_trans_matrix(trans_vec.x, trans_vec.y, trans_vec.z),
     )
-}
-
-pub fn multiply_matrices(m1: &Matrix4<f32>, m2: &Matrix4<f32>) -> Matrix4<f32> {
-    let mut multiplied: Matrix4<f32> = Matrix4::zeros();
-
-    for c in 0..4 {
-        for r in 0..4 {
-            multiplied[(r, c)] = m1[(r, 0)] * m2[(0, c)]
-                + m1[(r, 1)] * m2[(1, c)]
-                + m1[(r, 2)] * m2[(2, c)]
-                + m1[(r, 3)] * m2[(3, c)];
-        }
-    }
-
-    multiplied
 }

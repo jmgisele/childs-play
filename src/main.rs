@@ -53,7 +53,7 @@ fn main() {
         ));
 
         // increment rotation angle & rotation matrices
-        theta += 10.;
+        // theta += 10.;
         let x_rot_matrix: Matrix4<f32> = create_x_rot_mat(&theta);
         let z_rot_matrix: Matrix4<f32> = create_z_rot_mat(&theta);
         let world_matrix: Matrix4<f32> = world_matrix(&trans_vec, &z_rot_matrix, &x_rot_matrix);

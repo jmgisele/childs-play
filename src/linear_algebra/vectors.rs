@@ -42,10 +42,18 @@ impl Default for Vec3 {
     }
 }
 
+pub fn sub_vec(vec1: &Vector4<f32>, vec2: &Vector4<f32>) -> Vector4<f32> {
+    Vector4::new(vec1.x - vec2.x, vec1.y - vec2.y, vec2.z - vec2.z, 1.)
+}
+
+pub fn mult_vec(v1: &Vector4<f32>, k: f32) -> Vector4<f32> {
+    return Vector4::new(v1.x * k, v1.y * k, v1.z * k, 1.);
+}
+
 pub fn normalize_vec(vec: &Vector4<f32>) -> Vector4<f32> {
     let mag = vec_magnitude(&vec);
 
-    Vector4::new(vec.x / mag, vec.y / mag, vec.z / mag, vec.w / mag)
+    Vector4::new(vec.x / mag, vec.y / mag, vec.z / mag, 1.)
 }
 
 pub fn vec_magnitude(vec: &Vector4<f32>) -> f32 {
