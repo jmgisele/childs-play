@@ -14,6 +14,14 @@ impl Triangle {
     }
 }
 
+impl Clone for Triangle {
+    fn clone(&self) -> Self {
+        Triangle {
+            vertices: self.vertices,
+            color: self.color,
+        }
+    }
+}
 impl Default for Triangle {
     fn default() -> Self {
         Triangle {

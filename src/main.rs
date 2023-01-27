@@ -4,6 +4,7 @@ use crate::linear_algebra::data::Mesh;
 use crate::linear_algebra::matrices::{
     create_projection_matrix, create_x_rot_mat, create_z_rot_mat,
 };
+use crate::linear_algebra::plane::triangle_clip_plane;
 use crate::linear_algebra::triangles::{derive_normal, Triangle};
 use crate::linear_algebra::vectors::{add_vec, scale_x_y, sub_vec};
 use crate::meshes::initialize_mesh::get_mesh;
@@ -12,8 +13,8 @@ use linear_algebra::matrices::{
     create_point_at_matrix, create_y_rot_mat, invert_matrix, multiply_matrix_vec,
     multiply_matrix_vector, world_matrix,
 };
-use linear_algebra::vectors::{dot_product, get_line, mult_vec};
-use minifb::{Key, Window, WindowOptions};
+use linear_algebra::vectors::{dot_product, mult_vec};
+use minifb::{Key, KeyRepeat, Window, WindowOptions};
 use nalgebra::base::{Matrix4, Vector4};
 use raqote::{DrawTarget, SolidSource};
 
@@ -43,12 +44,12 @@ fn main() {
     let mut mesh: Mesh = get_mesh("src/meshes/meshes/axis.obj");
 
     let projection_matrix: Matrix4<f32> = create_projection_matrix();
-    let trans_vec: Vector4<f32> = Vector4::new(0., 0., 6., 0.);
+    let trans_vec: Vector4<f32> = Vector4::new(0., 0., 5., 0.);
     let mut yaw = 0.;
-    let theta: f32 = 0.;
+    let mut theta: f32 = 0.;
     let speed = 0.1;
 
-    let up: Vector4<f32> = Vector4::new(0., 1., 0., 1.);
+    let up: Vector4<f32> = Vector4::new(0., -1., 0., 1.);
     let mut camera: Vector4<f32> = Vector4::new(0., 0., 0., 1.);
     let mut look_dir: Vector4<f32> = Vector4::new(0., 0., 1., 0.);
     let mut target: Vector4<f32> = Vector4::new(0., 0., 1., 1.);
@@ -63,38 +64,45 @@ fn main() {
 
         // user input
         // back and forth
-        if window.is_key_down(Key::Up) {
-            camera.y += 2.;
+        if window.is_key_pressed(Key::Up, KeyRepeat::No) {
+            camera.y += 0.2;
         }
-        if window.is_key_down(Key::Left) {
-            camera.x += 2.;
+        if window.is_key_pressed(Key::Left, KeyRepeat::No) {
+            camera.x += 0.2;
         }
-        if window.is_key_down(Key::Down) {
-            camera.y -= 2.;
+        if window.is_key_pressed(Key::Down, KeyRepeat::No) {
+            camera.y -= 0.2;
         }
-        if window.is_key_down(Key::Right) {
-            camera.x -= 2.;
+        if window.is_key_pressed(Key::Right, KeyRepeat::No) {
+            camera.x -= 0.2;
+        }
+        // reset
+        if window.is_key_pressed(Key::Tab, KeyRepeat::No) {
+            camera = Vector4::new(0., 0., 0., 1.);
+            look_dir = Vector4::new(0., 0., 1., 1.);
+            yaw = 0.;
+            target = Vector4::new(0., 0., 1., 1.);
         }
 
         // turning camera
         // up + down
         let forward_vel: Vector4<f32> = mult_vec(&look_dir, speed);
-        // if window.is_key_down(Key::W) {
-        //     camera = add_vec(&camera, &forward_vel);
-        // }
+        if window.is_key_pressed(Key::W, KeyRepeat::No) {
+            camera = add_vec(&camera, &forward_vel);
+        }
 
-        // if window.is_key_down(Key::S) {
-        //     camera = sub_vec(&camera, &forward_vel);
-        // }
+        if window.is_key_pressed(Key::S, KeyRepeat::No) {
+            camera = sub_vec(&camera, &forward_vel);
+        }
 
-        // // l + r
-        // if window.is_key_down(Key::A) {
-        //     yaw -= 0.1;
-        // }
+        // l + r
+        if window.is_key_pressed(Key::A, KeyRepeat::No) {
+            yaw -= 0.1;
+        }
 
-        // if window.is_key_down(Key::D) {
-        //     yaw += 0.1;
-        // }
+        if window.is_key_pressed(Key::D, KeyRepeat::No) {
+            yaw += 0.1;
+        }
 
         // increment rotation angle & rotation matrices
         // theta += 10.;
@@ -127,26 +135,39 @@ fn main() {
             let camera_ray = sub_vec(&trans_triangle.vertices[0], &camera);
 
             if dot_product(&normal, &camera_ray) < 0. {
+                // add light
+                add_lightsource(normal, &mut trans_triangle);
+
                 // world space -> view space
                 for i in 0..3 {
                     trans_triangle.vertices[i] =
                         multiply_matrix_vec(&view, &trans_triangle.vertices[i]);
                 }
 
-                // project to 2D
-                for i in 0..3 {
-                    trans_triangle.vertices[i] =
-                        multiply_matrix_vector(&trans_triangle.vertices[i], &projection_matrix)
+                // Clip Viewed Triangle against near plane, this could form two additional
+                // additional triangles.
+                let mut clipped: [Triangle; 2] = [Triangle::default(), Triangle::default()];
+                let num_clipped_triangles: i32 = triangle_clip_plane(
+                    &Vector4::new(0., 0., 0.1, 1.),
+                    &Vector4::new(0., 0., 1., 1.),
+                    &trans_triangle,
+                    &mut clipped,
+                );
+
+                for n in 0..num_clipped_triangles {
+                    let mut clip_tri: Triangle = clipped[n as usize].clone();
+                    // project to 2D
+                    for i in 0..3 {
+                        clip_tri.vertices[i] =
+                            multiply_matrix_vector(&(clip_tri.vertices[i]), &projection_matrix)
+                    }
+
+                    // Scale into view
+                    scale_x_y(&mut clip_tri);
+
+                    // add to final triangle queue
+                    triangle_queue.push(clip_tri);
                 }
-
-                // Scale into view
-                scale_x_y(&mut trans_triangle);
-
-                // add light
-                add_lightsource(normal, &mut trans_triangle);
-
-                // add to final triangle queue
-                triangle_queue.push(trans_triangle);
             }
         }
 
