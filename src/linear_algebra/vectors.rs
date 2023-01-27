@@ -1,10 +1,24 @@
-use crate::{Triangle, HEIGHT};
+use crate::{Triangle, HEIGHT, WIDTH};
 use nalgebra::base::Vector4;
 
 pub fn scale_x_y(triangle: &mut Triangle) {
+    let offset_view: Vector4<f32> = Vector4::new(1., 1., 0., 0.);
+
+    // scale into cartesian
     for i in 0..3 {
-        triangle.vertices[i].x = (triangle.vertices[i].x + 1.) * 0.5 * HEIGHT as f32;
-        triangle.vertices[i].y = (triangle.vertices[i].y + 1.) * 0.5 * HEIGHT as f32;
+        triangle.vertices[i] = div_vec(&triangle.vertices[i], triangle.vertices[i].w)
+    }
+
+    // invert x and y
+    // for i in 0..3 {
+    //     triangle.vertices[i].x *= -1.;
+    //     triangle.vertices[i].y *= -1.;
+    // }
+    // offset into normal space and invert x and y
+    for i in 0..3 {
+        triangle.vertices[i] = add_vec(&triangle.vertices[i], &offset_view);
+        triangle.vertices[i].x *= (triangle.vertices[i].y + 1.) * 0.5 * WIDTH as f32;
+        triangle.vertices[i].y *= (triangle.vertices[i].y + 1.) * 0.5 * HEIGHT as f32;
     }
 }
 

@@ -10,8 +10,7 @@ use crate::linear_algebra::vectors::{add_vec, scale_x_y, sub_vec};
 use crate::meshes::initialize_mesh::get_mesh;
 
 use linear_algebra::matrices::{
-    create_point_at_matrix, create_y_rot_mat, invert_matrix, multiply_matrix_vec,
-    multiply_matrix_vector, world_matrix,
+    create_point_at_matrix, create_y_rot_mat, invert_matrix, multiply_matrix_vec, world_matrix,
 };
 use linear_algebra::vectors::{dot_product, mult_vec};
 use minifb::{Key, KeyRepeat, Window, WindowOptions};
@@ -44,12 +43,12 @@ fn main() {
     let mut mesh: Mesh = get_mesh("src/meshes/meshes/axis.obj");
 
     let projection_matrix: Matrix4<f32> = create_projection_matrix();
-    let trans_vec: Vector4<f32> = Vector4::new(0., 0., 5., 0.);
+    let trans_vec: Vector4<f32> = Vector4::new(0., 0., 10., 1.);
     let mut yaw = 0.;
     let mut theta: f32 = 0.;
     let speed = 0.1;
 
-    let up: Vector4<f32> = Vector4::new(0., -1., 0., 1.);
+    let up: Vector4<f32> = Vector4::new(0., 1., 0., 1.);
     let mut camera: Vector4<f32> = Vector4::new(0., 0., 0., 1.);
     let mut look_dir: Vector4<f32> = Vector4::new(0., 0., 1., 0.);
     let mut target: Vector4<f32> = Vector4::new(0., 0., 1., 1.);
@@ -97,11 +96,11 @@ fn main() {
 
         // l + r
         if window.is_key_pressed(Key::A, KeyRepeat::No) {
-            yaw -= 0.1;
+            yaw -= 1.;
         }
 
         if window.is_key_pressed(Key::D, KeyRepeat::No) {
-            yaw += 0.1;
+            yaw += 1.;
         }
 
         // increment rotation angle & rotation matrices
@@ -126,13 +125,13 @@ fn main() {
             // world matrix
             for i in 0..3 {
                 trans_triangle.vertices[i] =
-                    multiply_matrix_vector(&trans_triangle.vertices[i], &world_matrix)
+                    multiply_matrix_vec(&world_matrix, &trans_triangle.vertices[i])
             }
 
             //normals
             let normal: Vector4<f32> = derive_normal(&trans_triangle);
 
-            let camera_ray = sub_vec(&trans_triangle.vertices[0], &camera);
+            let camera_ray: Vector4<f32> = sub_vec(&trans_triangle.vertices[0], &camera);
 
             if dot_product(&normal, &camera_ray) < 0. {
                 // add light
@@ -159,7 +158,7 @@ fn main() {
                     // project to 2D
                     for i in 0..3 {
                         clip_tri.vertices[i] =
-                            multiply_matrix_vector(&(clip_tri.vertices[i]), &projection_matrix)
+                            multiply_matrix_vec(&projection_matrix, &(clip_tri.vertices[i]))
                     }
 
                     // Scale into view

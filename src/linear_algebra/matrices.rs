@@ -19,7 +19,7 @@ pub fn create_projection_matrix() -> Matrix4<f32> {
     proj_matrix[(1, 1)] = f_fov_rad;
     proj_matrix[(2, 2)] = f_far / (f_far - f_near);
     proj_matrix[(3, 2)] = (-f_far * f_near) / (f_far - f_near);
-    proj_matrix[(2, 3)] = 1.0;
+    proj_matrix[(2, 3)] = -1.0;
     proj_matrix[(3, 3)] = 0.0;
 
     proj_matrix

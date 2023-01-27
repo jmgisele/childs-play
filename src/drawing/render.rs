@@ -19,12 +19,11 @@ pub fn render(window: &mut Window, triangle_queue: Vec<Triangle>, dt: &mut DrawT
         let mut num_new_triangles = 1;
 
         for p in 0..4 {
-            let mut num_tris_to_add = 0;
             while num_new_triangles > 0 {
-                let test = vec_of_triangles.pop().unwrap();
+                let test: Triangle = vec_of_triangles.pop().expect("expected a triangle");
                 num_new_triangles -= 1;
 
-                num_tris_to_add = match p {
+                let num_tris_to_add = match p {
                     0 => triangle_clip_plane(
                         &Vector4::new(0., 0., 0., 1.),
                         &Vector4::new(0., 1., 0., 1.),
@@ -50,21 +49,20 @@ pub fn render(window: &mut Window, triangle_queue: Vec<Triangle>, dt: &mut DrawT
                         &mut clipped,
                     ),
                     _ => panic!("your rectangle is a polygon"),
+                };
+                for w in 0..num_tris_to_add {
+                    vec_of_triangles.push(clipped[w as usize].clone())
                 }
             }
-            for w in 0..num_tris_to_add {
-                vec_of_triangles.push(clipped[w as usize].clone())
-            }
+
             num_new_triangles = vec_of_triangles.len();
         }
 
         for final_triangle in vec_of_triangles.iter() {
             // Rasterize triangle
             let mut pb = PathBuilder::new();
-            println!("{:#?}", final_triangle);
 
             draw_triangle(&mut pb, &final_triangle);
-            println!("got here");
             let path = pb.finish();
 
             // color in shape
