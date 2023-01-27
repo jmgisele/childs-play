@@ -5,12 +5,13 @@ use nalgebra::base::{Matrix4, Vector4};
 use super::vectors::{cross_product, dot_product};
 
 pub fn create_projection_matrix() -> Matrix4<f32> {
-    let mut proj_matrix: Matrix4<f32> = Matrix4::from_element(0.0);
+    let mut proj_matrix: Matrix4<f32> = Matrix4::zeros();
 
     let f_near = 0.1;
     let f_far = 1000.0;
     let f_fov = 90.0;
     let f_aspect_ratio = (HEIGHT / WIDTH) as f32;
+
     let f_calc: f32 = f_fov * 0.5 / 180.0 * 3.14159;
     let f_fov_rad = 1.0 / (f_calc).tan();
 
@@ -25,10 +26,9 @@ pub fn create_projection_matrix() -> Matrix4<f32> {
 }
 
 pub fn create_x_rot_mat(theta: &f32) -> Matrix4<f32> {
-    let mut mat: Matrix4<f32> = Matrix4::from_element(0.0);
+    let mut mat: Matrix4<f32> = Matrix4::zeros();
     let theta = theta.to_radians();
 
-    // Rotation X
     mat[(0, 0)] = 1.;
     mat[(1, 1)] = (theta * 0.5).cos();
     mat[(1, 2)] = (theta * 0.5).sin();
@@ -38,11 +38,11 @@ pub fn create_x_rot_mat(theta: &f32) -> Matrix4<f32> {
 
     mat
 }
+
 pub fn create_z_rot_mat(theta: &f32) -> Matrix4<f32> {
-    let mut mat: Matrix4<f32> = Matrix4::from_element(0.0);
+    let mut mat: Matrix4<f32> = Matrix4::zeros();
     let theta = theta.to_radians();
 
-    // Rotation Z
     mat[(0, 0)] = (theta).cos();
     mat[(0, 1)] = (theta).sin();
     mat[(1, 0)] = -(theta).sin();
@@ -53,48 +53,61 @@ pub fn create_z_rot_mat(theta: &f32) -> Matrix4<f32> {
     mat
 }
 
-pub fn multiply_matrix_vec(input_vec: &Vector4<f32>, proj_mat: &Matrix4<f32>) -> Vector4<f32> {
+pub fn create_y_rot_mat(theta: &f32) -> Matrix4<f32> {
+    let mut mat: Matrix4<f32> = Matrix4::zeros();
+    let theta = theta.to_radians();
+
+    mat[(0, 0)] = theta.cos();
+    mat[(0, 2)] = (theta).sin();
+    mat[(2, 0)] = -(theta).sin();
+    mat[(1, 1)] = 1.;
+    mat[(2, 2)] = (theta).cos();
+    mat[(3, 3)] = 1.;
+
+    mat
+}
+pub fn multiply_matrix_vec(mat: &Matrix4<f32>, input_vec: &Vector4<f32>) -> Vector4<f32> {
     Vector4::new(
-        input_vec.x * proj_mat[(0, 0)]
-            + input_vec.y * proj_mat[(1, 0)]
-            + input_vec.z * proj_mat[(2, 0)]
-            + proj_mat[(3, 0)],
-        input_vec.x * proj_mat[(0, 1)]
-            + input_vec.y * proj_mat[(1, 1)]
-            + input_vec.z * proj_mat[(2, 1)]
-            + proj_mat[(3, 1)],
-        input_vec.x * proj_mat[(0, 2)]
-            + input_vec.y * proj_mat[(1, 2)]
-            + input_vec.z * proj_mat[(2, 2)]
-            + proj_mat[(3, 2)],
-        input_vec.x * proj_mat[(0, 3)]
-            + input_vec.y * proj_mat[(1, 3)]
-            + input_vec.z * proj_mat[(2, 3)]
-            + input_vec.w * proj_mat[(3, 3)],
+        input_vec.x * mat[(0, 0)]
+            + input_vec.y * mat[(1, 0)]
+            + input_vec.z * mat[(2, 0)]
+            + mat[(3, 0)],
+        input_vec.x * mat[(0, 1)]
+            + input_vec.y * mat[(1, 1)]
+            + input_vec.z * mat[(2, 1)]
+            + mat[(3, 1)],
+        input_vec.x * mat[(0, 2)]
+            + input_vec.y * mat[(1, 2)]
+            + input_vec.z * mat[(2, 2)]
+            + mat[(3, 2)],
+        input_vec.x * mat[(0, 3)]
+            + input_vec.y * mat[(1, 3)]
+            + input_vec.z * mat[(2, 3)]
+            + input_vec.w * mat[(3, 3)],
     )
 }
 
-pub fn multiply_matrix_vector(input_vec: &Vector4<f32>, proj_mat: &Matrix4<f32>) -> Vector4<f32> {
+pub fn multiply_matrix_vector(input_vec: &Vector4<f32>, mat: &Matrix4<f32>) -> Vector4<f32> {
     let mut projected_vector: Vector4<f32> = Vector4::new(
-        input_vec.x * proj_mat[(0, 0)]
-            + input_vec.y * proj_mat[(1, 0)]
-            + input_vec.z * proj_mat[(2, 0)]
-            + proj_mat[(3, 0)],
-        input_vec.x * proj_mat[(0, 1)]
-            + input_vec.y * proj_mat[(1, 1)]
-            + input_vec.z * proj_mat[(2, 1)]
-            + proj_mat[(3, 1)],
-        input_vec.x * proj_mat[(0, 2)]
-            + input_vec.y * proj_mat[(1, 2)]
-            + input_vec.z * proj_mat[(2, 2)]
-            + proj_mat[(3, 2)],
+        input_vec.x * mat[(0, 0)]
+            + input_vec.y * mat[(1, 0)]
+            + input_vec.z * mat[(2, 0)]
+            + mat[(3, 0)],
+        input_vec.x * mat[(0, 1)]
+            + input_vec.y * mat[(1, 1)]
+            + input_vec.z * mat[(2, 1)]
+            + mat[(3, 1)],
+        input_vec.x * mat[(0, 2)]
+            + input_vec.y * mat[(1, 2)]
+            + input_vec.z * mat[(2, 2)]
+            + mat[(3, 2)],
         1.,
     );
 
-    let w: f32 = input_vec.x * proj_mat[(0, 3)]
-        + input_vec.y * proj_mat[(1, 3)]
-        + input_vec.z * proj_mat[(2, 3)]
-        + proj_mat[(3, 3)];
+    let w: f32 = input_vec.x * mat[(0, 3)]
+        + input_vec.y * mat[(1, 3)]
+        + input_vec.z * mat[(2, 3)]
+        + mat[(3, 3)];
 
     if w != 0.0 {
         for i in 0..3 {
@@ -120,14 +133,35 @@ pub fn multiply_matrices(m1: &Matrix4<f32>, m2: &Matrix4<f32>) -> Matrix4<f32> {
     multiplied
 }
 
+pub fn invert_matrix(mat: &Matrix4<f32>) -> Matrix4<f32> {
+    #[rustfmt::skip]
+    let mut inverted: Matrix4<f32> = Matrix4::new(mat[(0,0)], mat[(1,0)], mat[(2,0)], 0.,
+                                                mat[(0,1)],mat[(1,1)],mat[(2,1)], 0.,
+                                                mat[(0,2)],mat[(1,2)],mat[(2,2)], 0.,
+                                                0.,0.,0.,   1. );
+
+    inverted[(3, 0)] = -(mat[(3, 0)] * inverted[(0, 0)]
+        + mat[(3, 1)] * inverted[(1, 0)]
+        + mat[(3, 2)] * inverted[(2, 0)]);
+    inverted[(3, 1)] = -(mat[(3, 0)] * inverted[(0, 1)]
+        + mat[(3, 1)] * inverted[(1, 1)]
+        + mat[(3, 2)] * inverted[(2, 1)]);
+    inverted[(3, 2)] = -(mat[(3, 0)] * inverted[(0, 2)]
+        + mat[(3, 1)] * inverted[(1, 2)]
+        + mat[(3, 2)] * inverted[(2, 2)]);
+
+    inverted
+}
+
 pub fn create_point_at_matrix(
     position: Vector4<f32>,
     target: Vector4<f32>,
     up: Vector4<f32>,
 ) -> Matrix4<f32> {
     let new_forward_dir: Vector4<f32> = normalize_vec(&sub_vec(&target, &position));
+
     let a: Vector4<f32> = mult_vec(&new_forward_dir, dot_product(&up, &new_forward_dir));
-    let new_up_dir: Vector4<f32> = sub_vec(&up, &a);
+    let new_up_dir: Vector4<f32> = normalize_vec(&sub_vec(&up, &a));
 
     let new_right_dir: Vector4<f32> = cross_product(&new_up_dir, &new_forward_dir);
 
@@ -138,11 +172,13 @@ pub fn create_point_at_matrix(
                                                     new_forward_dir.x, new_forward_dir.y, new_forward_dir.z, 0.,
                                                     position.x, position.y, position.z, 1.,
                                                 );
+
     point_at
 }
 
 pub fn create_trans_matrix(x: f32, y: f32, z: f32) -> Matrix4<f32> {
     let mut matrix: Matrix4<f32> = Matrix4::zeros();
+
     matrix[(0, 0)] = 1.;
     matrix[(1, 1)] = 1.;
     matrix[(2, 2)] = 1.;
@@ -150,6 +186,7 @@ pub fn create_trans_matrix(x: f32, y: f32, z: f32) -> Matrix4<f32> {
     matrix[(3, 0)] = x;
     matrix[(3, 1)] = y;
     matrix[(3, 2)] = z;
+
     matrix
 }
 

@@ -8,7 +8,10 @@ pub fn render(window: &mut Window, triangle_queue: Vec<Triangle>, dt: &mut DrawT
     for final_triangle in triangle_queue.iter() {
         // Rasterize triangle
         let mut pb = PathBuilder::new();
+        println!("{:#?}", final_triangle);
+
         draw_triangle(&mut pb, &final_triangle);
+        println!("got here");
         let path = pb.finish();
 
         // color in shape
