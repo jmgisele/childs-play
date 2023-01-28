@@ -19,7 +19,7 @@ pub fn create_projection_matrix() -> Matrix4<f32> {
     proj_matrix[(1, 1)] = f_fov_rad;
     proj_matrix[(2, 2)] = f_far / (f_far - f_near);
     proj_matrix[(3, 2)] = (-f_far * f_near) / (f_far - f_near);
-    proj_matrix[(2, 3)] = -1.0;
+    proj_matrix[(2, 3)] = 1.0;
     proj_matrix[(3, 3)] = 0.0;
 
     proj_matrix
@@ -85,37 +85,6 @@ pub fn multiply_matrix_vec(mat: &Matrix4<f32>, input_vec: &Vector4<f32>) -> Vect
             + input_vec.z * mat[(2, 3)]
             + input_vec.w * mat[(3, 3)],
     )
-}
-
-pub fn multiply_matrix_vector(input_vec: &Vector4<f32>, mat: &Matrix4<f32>) -> Vector4<f32> {
-    let mut projected_vector: Vector4<f32> = Vector4::new(
-        input_vec.x * mat[(0, 0)]
-            + input_vec.y * mat[(1, 0)]
-            + input_vec.z * mat[(2, 0)]
-            + mat[(3, 0)],
-        input_vec.x * mat[(0, 1)]
-            + input_vec.y * mat[(1, 1)]
-            + input_vec.z * mat[(2, 1)]
-            + mat[(3, 1)],
-        input_vec.x * mat[(0, 2)]
-            + input_vec.y * mat[(1, 2)]
-            + input_vec.z * mat[(2, 2)]
-            + mat[(3, 2)],
-        1.,
-    );
-
-    let w: f32 = input_vec.x * mat[(0, 3)]
-        + input_vec.y * mat[(1, 3)]
-        + input_vec.z * mat[(2, 3)]
-        + mat[(3, 3)];
-
-    if w != 0.0 {
-        for i in 0..3 {
-            projected_vector[i] /= w
-        }
-    }
-
-    projected_vector
 }
 
 pub fn multiply_matrices(m1: &Matrix4<f32>, m2: &Matrix4<f32>) -> Matrix4<f32> {

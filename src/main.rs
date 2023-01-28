@@ -43,15 +43,12 @@ fn main() {
     let mut mesh: Mesh = get_mesh("src/meshes/meshes/axis.obj");
 
     let projection_matrix: Matrix4<f32> = create_projection_matrix();
-    let trans_vec: Vector4<f32> = Vector4::new(0., 0., 10., 1.);
+    let trans_vec: Vector4<f32> = Vector4::new(0., 0., 5., 1.);
     let mut yaw = 0.;
-    let mut theta: f32 = 0.;
+    let theta: f32 = 0.;
     let speed = 0.1;
-
-    let up: Vector4<f32> = Vector4::new(0., 1., 0., 1.);
     let mut camera: Vector4<f32> = Vector4::new(0., 0., 0., 1.);
-    let mut look_dir: Vector4<f32> = Vector4::new(0., 0., 1., 0.);
-    let mut target: Vector4<f32> = Vector4::new(0., 0., 1., 1.);
+    let mut look_dir = Vector4::new(0., 0., 1., 1.);
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
         let mut dt = DrawTarget::new(WIDTH as i32, HEIGHT as i32);
@@ -80,7 +77,6 @@ fn main() {
             camera = Vector4::new(0., 0., 0., 1.);
             look_dir = Vector4::new(0., 0., 1., 1.);
             yaw = 0.;
-            target = Vector4::new(0., 0., 1., 1.);
         }
 
         // turning camera
@@ -110,6 +106,9 @@ fn main() {
         let world_matrix: Matrix4<f32> = world_matrix(&trans_vec, &z_rot_matrix, &x_rot_matrix);
 
         // camera stuff
+        let up: Vector4<f32> = Vector4::new(0., 1., 0., 1.);
+        let mut target: Vector4<f32> = Vector4::new(0., 0., 1., 1.);
+
         let rotated_cam: Matrix4<f32> = create_y_rot_mat(&yaw);
         look_dir = multiply_matrix_vec(&rotated_cam, &target);
         target = add_vec(&camera, &look_dir);
