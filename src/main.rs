@@ -40,7 +40,7 @@ fn main() {
     window.limit_update_rate(Some(std::time::Duration::from_micros(16660)));
 
     // setting up mesh
-    let mut mesh: Mesh = get_mesh("src/meshes/meshes/axis.obj");
+    let mut mesh: Mesh = get_mesh("src/meshes/meshes/spider.obj");
 
     let projection_matrix: Matrix4<f32> = create_projection_matrix();
     let trans_vec: Vector4<f32> = Vector4::new(0., 0., 5., 1.);
@@ -60,20 +60,20 @@ fn main() {
 
         // user input
         // back and forth
-        if window.is_key_pressed(Key::Up, KeyRepeat::No) {
+        if window.is_key_down(Key::Up) {
             camera.y += 0.2;
         }
-        if window.is_key_pressed(Key::Left, KeyRepeat::No) {
+        if window.is_key_down(Key::Left) {
             camera.x += 0.2;
         }
-        if window.is_key_pressed(Key::Down, KeyRepeat::No) {
+        if window.is_key_down(Key::Down) {
             camera.y -= 0.2;
         }
-        if window.is_key_pressed(Key::Right, KeyRepeat::No) {
+        if window.is_key_down(Key::Right) {
             camera.x -= 0.2;
         }
         // reset
-        if window.is_key_pressed(Key::Tab, KeyRepeat::No) {
+        if window.is_key_down(Key::Tab) {
             camera = Vector4::new(0., 0., 0., 1.);
             look_dir = Vector4::new(0., 0., 1., 1.);
             yaw = 0.;
@@ -86,16 +86,16 @@ fn main() {
             camera = add_vec(&camera, &forward_vel);
         }
 
-        if window.is_key_pressed(Key::S, KeyRepeat::No) {
+        if window.is_key_down(Key::S) {
             camera = sub_vec(&camera, &forward_vel);
         }
 
         // l + r
-        if window.is_key_pressed(Key::A, KeyRepeat::No) {
+        if window.is_key_down(Key::A) {
             yaw -= 1.;
         }
 
-        if window.is_key_pressed(Key::D, KeyRepeat::No) {
+        if window.is_key_down(Key::D) {
             yaw += 1.;
         }
 
