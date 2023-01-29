@@ -1,3 +1,4 @@
+pub(crate) mod clipping;
 pub(crate) mod data;
 pub(crate) mod matrices;
 pub(crate) mod plane;
