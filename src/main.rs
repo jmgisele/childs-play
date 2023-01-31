@@ -25,7 +25,12 @@ mod meshes;
 pub const WIDTH: usize = 400;
 pub const HEIGHT: usize = 400;
 
+use nannou::prelude::*;
 fn main() {
+    // nannou
+    nannou::app(model).event(event).run();
+
+    // raqote
     let mut window = Window::new(
         "Baby Graphics Engine - ESC to exit",
         WIDTH,
@@ -174,4 +179,29 @@ fn main() {
         // render
         render(&mut window, triangle_queue, &mut dt)
     }
+}
+struct Model {}
+
+fn model(app: &App) -> Model {
+    app.new_window()
+        .size(WIDTH as u32, HEIGHT as u32)
+        .view(view)
+        .build()
+        .unwrap();
+    Model {}
+}
+
+fn view(app: &App, _model: &Model, frame: Frame) {
+    frame.clear(BLACK);
+
+    let draw = app.draw();
+
+    draw.to_frame(app, &frame).unwrap();
+}
+
+fn event(_app: &App, _model: &mut Model, _event: Event) {}
+
+
+fn get_triangles_to_render() => Vec<Triangle> {
+
 }
