@@ -40,7 +40,7 @@ pub fn initialize_user_controls(
     // turning camera
     // up + down
     let forward_vel: Vector4<f32> = mult_vec(&look_dir, *speed);
-    if window.is_key_pressed(Key::W, KeyRepeat::No) {
+    if window.is_key_down(Key::W) {
         *camera = add_vec(&camera, &forward_vel);
     }
 

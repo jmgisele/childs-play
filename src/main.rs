@@ -39,15 +39,17 @@ fn main() {
 
     // setting up other globals
     let projection_matrix: Matrix4<f32> = create_projection_matrix();
-    let trans_vec: Vector4<f32> = Vector4::new(1., 1., 4., 1.);
+    let trans_vec: Vector4<f32> = Vector4::new(0., 0., 8., 1.);
     let mut yaw = 0.;
-    let theta: f32 = 0.;
+    let mut theta: f32 = 0.;
     let speed = 0.1;
     let mut camera: Vector4<f32> = Vector4::new(0., 0., 0., 1.);
     let mut look_dir = Vector4::new(0., 0., 1., 1.);
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
         let mut dt = DrawTarget::new(WIDTH as i32, HEIGHT as i32);
+
+        theta += 1.;
 
         initialize_user_controls(
             &window,

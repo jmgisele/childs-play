@@ -10,7 +10,7 @@ pub struct Triangle {
 
 impl Triangle {
     pub fn get_avg_z(&self) -> f32 {
-        (self.vertices[0].z + self.vertices[0].z + self.vertices[0].z) / 3.
+        (self.vertices[0].z + self.vertices[1].z + self.vertices[2].z) / 3.
     }
 }
 
