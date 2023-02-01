@@ -5,25 +5,25 @@ use crate::linear_algebra::clipping::clip_against_window;
 use crate::linear_algebra::triangles::Triangle;
 use crate::{HEIGHT, WIDTH};
 use minifb::Window;
-// use nannou::Draw;
+use nannou::Draw;
 use raqote::{
     DrawOptions, DrawTarget, LineCap, LineJoin, PathBuilder, SolidSource, Source, StrokeStyle,
 };
 
-// use super::shapes::draw_triangle_nannou;
+use super::shapes::_draw_triangle_nannou;
 
-// pub fn render_nannou(triangles: Vec<Triangle>, draw: &Draw) {
-//     for tri in triangles.iter() {
-//         let mut clipped: [Triangle; 2] = [Triangle::default(), Triangle::default()];
-//         let mut vec_of_triangles: Vec<Triangle> = Vec::new();
+pub fn _render_nannou(triangles: Vec<Triangle>, draw: &Draw) {
+    for tri in triangles.iter() {
+        let mut clipped: [Triangle; 2] = [Triangle::default(), Triangle::default()];
+        let mut vec_of_triangles: Vec<Triangle> = Vec::new();
 
-//         clip_against_window(&mut clipped, &mut vec_of_triangles, tri);
+        clip_against_window(&mut clipped, &mut vec_of_triangles, tri);
 
-//         for final_triangle in vec_of_triangles.iter() {
-//             draw_triangle_nannou(&draw, final_triangle);
-//         }
-//     }
-// }
+        for final_triangle in vec_of_triangles.iter() {
+            _draw_triangle_nannou(&draw, final_triangle);
+        }
+    }
+}
 
 pub fn render(window: &mut Window, triangle_queue: Vec<Triangle>, dt: &mut DrawTarget) {
     for triangle in triangle_queue.iter() {

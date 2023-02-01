@@ -6,6 +6,7 @@ use crate::meshes::initialize_mesh::get_mesh;
 
 use drawing::controls::initialize_user_controls;
 use linear_algebra::queue::get_triangle_queue;
+// use meshes::cube::get_cube_mesh;
 use minifb::{Key, Window, WindowOptions};
 use nalgebra::base::{Matrix4, Vector4};
 use raqote::DrawTarget;
@@ -18,12 +19,7 @@ mod meshes;
 pub const WIDTH: usize = 400;
 pub const HEIGHT: usize = 400;
 
-// use nannou::prelude::*;
 fn main() {
-    // nannou
-    // nannou::app(model).event(event).run();
-
-    // raqote
     let mut window = Window::new(
         "Baby Graphics Engine - ESC to exit",
         WIDTH,
@@ -39,9 +35,11 @@ fn main() {
 
     // setting up mesh
     let mut mesh: Mesh = get_mesh("src/meshes/meshes/video_ship.obj");
+    // let mut mesh = get_cube_mesh();
 
+    // setting up other globals
     let projection_matrix: Matrix4<f32> = create_projection_matrix();
-    let trans_vec: Vector4<f32> = Vector4::new(0., 0., 5., 1.);
+    let trans_vec: Vector4<f32> = Vector4::new(1., 1., 4., 1.);
     let mut yaw = 0.;
     let theta: f32 = 0.;
     let speed = 0.1;
@@ -73,19 +71,3 @@ fn main() {
         render(&mut window, triangle_queue, &mut dt)
     }
 }
-
-// struct Model {}
-
-// fn model(app: &App) -> Model {
-//     app.new_window().size(512, 512).view(view).build().unwrap();
-//     Model {}
-// }
-
-// fn view(app: &App, _model: &Model, frame: Frame) {
-//     frame.clear(BLACK);
-//     let draw = app.draw();
-
-//     draw.to_frame(app, &frame).unwrap();
-// }
-
-// fn event(_app: &App, _model: &mut Model, _event: Event) {}

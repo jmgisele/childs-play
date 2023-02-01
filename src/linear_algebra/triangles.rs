@@ -47,21 +47,3 @@ pub fn derive_normal(triangle: &Triangle) -> Vector4<f32> {
 
     normalize_vec(&cross_product(&line_1, &line_2))
 }
-
-// impl Triangle {
-//     fn test() -> Self {
-//         Triangle {
-//             vertices: [
-//                 Vector4::new(0., 0., 0., 1.),
-//                 Vector4::new(0., 0., 0., 1.),
-//                 Vector4::new(0., 0., 0., 1.),
-//             ],
-//             color: SolidSource {
-//                 r: 0xd6,
-//                 g: 0x7a,
-//                 b: 0x67,
-//                 a: 0xff,
-//             },
-//         }
-//     }
-// }
