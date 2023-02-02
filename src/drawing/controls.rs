@@ -1,5 +1,5 @@
 use crate::linear_algebra::vectors::{add_vec, mult_vec, sub_vec};
-use minifb::{Key, KeyRepeat, Window};
+use minifb::{Key, Window};
 use nalgebra::base::Vector4;
 use raqote::{DrawTarget, SolidSource};
 
