@@ -20,7 +20,6 @@ pub fn get_triangle_queue(
     projection_matrix: Matrix4<f32>,
 ) -> Vec<Triangle> {
     // increment rotation angle & rotation matrices
-    // theta += 10.;
     let x_rot_matrix: Matrix4<f32> = create_x_rot_mat(theta);
     let z_rot_matrix: Matrix4<f32> = create_z_rot_mat(theta);
     let world_matrix: Matrix4<f32> = world_matrix(&trans_vec, &z_rot_matrix, &x_rot_matrix);
@@ -66,7 +65,7 @@ pub fn get_triangle_queue(
             // additional triangles.
             let mut clipped: [Triangle; 2] = [Triangle::default(), Triangle::default()];
             let num_clipped_triangles: i32 = triangle_clip_plane(
-                &Vector4::new(0., 0., 0.1, 1.),
+                &Vector4::new(0., 0., 1., 1.),
                 &Vector4::new(0., 0., 1., 1.),
                 &trans_triangle,
                 &mut clipped,

@@ -6,6 +6,7 @@ use crate::meshes::initialize_mesh::get_mesh;
 
 use drawing::controls::initialize_user_controls;
 use linear_algebra::queue::get_triangle_queue;
+use meshes::cube::_get_cube_mesh;
 // use meshes::cube::get_cube_mesh;
 use minifb::{Key, Window, WindowOptions};
 use nalgebra::base::{Matrix4, Vector4};
@@ -16,8 +17,8 @@ mod drawing;
 mod linear_algebra;
 mod meshes;
 
-pub const WIDTH: usize = 400;
-pub const HEIGHT: usize = 400;
+pub const WIDTH: usize = 300;
+pub const HEIGHT: usize = 300;
 
 fn main() {
     let mut window = Window::new(
@@ -34,8 +35,9 @@ fn main() {
     window.limit_update_rate(Some(std::time::Duration::from_micros(16660)));
 
     // setting up mesh
-    let mut mesh: Mesh = get_mesh("src/meshes/meshes/video_ship.obj");
-    // let mut mesh = get_cube_mesh();
+    // let mut mesh: Mesh = get_mesh("src/meshes/meshes/video_ship.obj");
+    // let mut mesh: Mesh = get_mesh("src/meshes/meshes/teapot.obj");
+    let mut mesh = _get_cube_mesh();
 
     // setting up other globals
     let projection_matrix: Matrix4<f32> = create_projection_matrix();

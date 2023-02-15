@@ -14,6 +14,7 @@ pub fn scale_x_y(triangle: &mut Triangle) {
         triangle.vertices[i].x *= -1.;
         triangle.vertices[i].y *= -1.;
     }
+
     // offset into normal space and invert x and y
     for i in 0..3 {
         triangle.vertices[i] = add_vec(&triangle.vertices[i], &offset_view);
