@@ -1,4 +1,4 @@
-![Demo Picture](images/childsplay.gif)
+![Demo Picture](images/childs_play.gif)
 # Baby's First Graphics Engine
 
 This was my first Rust project!
