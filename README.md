@@ -12,3 +12,5 @@ Mostly: because I was at a retreat at the Recurse Center! I wanted to pick up th
 
 ## Where can I read more?
 I made a whole writeup over at my [blog](https://www.jamesgisele.com/blog/software_renderer/#wasm-example). As a bonus - if you get to the end you get a WASM-powered Kate Bush Cube Visuzalizer with Interactive Perspective Camera for your troubles.
+
+
